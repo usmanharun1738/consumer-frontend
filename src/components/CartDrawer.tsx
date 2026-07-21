@@ -3,6 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react';
 import { useCart } from '../hooks/useCart';
 import { Link } from 'react-router-dom';
+import type { CartItem } from '../types';
 
 interface CartDrawerProps {
     isOpen: boolean;
@@ -13,8 +14,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     const { cartQuery, updateQuantity, removeItem } = useCart();
     const { data: cartItems, isLoading } = cartQuery;
 
-    const totalItems = cartItems?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-    const totalPrice = cartItems?.reduce((sum, item) => sum + item.subtotal, 0) || 0;
+    // Remove unused totalItems – we don't need it here
+    const totalPrice = cartItems?.reduce(
+        (sum: number, item: CartItem) => sum + item.subtotal,
+        0
+    ) || 0;
 
     return (
         <Transition.Root show={isOpen} as={Fragment}>
@@ -30,7 +34,6 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 >
                     <div className="fixed inset-0 bg-gray-500 bg-opacity-75" />
                 </Transition.Child>
-
                 <div className="fixed inset-0 overflow-hidden">
                     <div className="absolute inset-0 overflow-hidden">
                         <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
@@ -56,13 +59,12 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                                                 <X size={24} />
                                             </button>
                                         </div>
-
                                         <div className="flex-1 overflow-y-auto px-4 py-6">
                                             {isLoading ? (
                                                 <div className="text-center py-8 text-gray-500">Loading...</div>
                                             ) : cartItems && cartItems.length > 0 ? (
                                                 <ul className="divide-y divide-gray-200">
-                                                    {cartItems.map((item) => (
+                                                    {cartItems.map((item: CartItem) => (
                                                         <li key={item.id} className="py-4 flex">
                                                             <div className="flex-1">
                                                                 <h4 className="text-sm font-medium text-gray-900">
@@ -109,7 +111,6 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                                                 </div>
                                             )}
                                         </div>
-
                                         {cartItems && cartItems.length > 0 && (
                                             <div className="border-t border-gray-200 px-4 py-6">
                                                 <div className="flex justify-between text-base font-medium text-gray-900">

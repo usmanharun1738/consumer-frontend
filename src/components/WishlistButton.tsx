@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Heart } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { wishlist } from '../api/endpoints';
@@ -11,7 +10,6 @@ interface WishlistButtonProps {
 export default function WishlistButton({ productId, size = 'md' }: WishlistButtonProps) {
     const queryClient = useQueryClient();
 
-    // Fetch the wishlist to check if this product is already saved
     const { data: wishlistData } = useQuery({
         queryKey: ['wishlist'],
         queryFn: () => wishlist.list().then(res => res.data),
@@ -26,27 +24,22 @@ export default function WishlistButton({ productId, size = 'md' }: WishlistButto
                 ? wishlist.remove(productId)
                 : wishlist.add(productId),
         onMutate: async () => {
-            // Optimistic update: toggle the wishlist status immediately
             await queryClient.cancelQueries({ queryKey: ['wishlist'] });
             const previousWishlist = queryClient.getQueryData(['wishlist']);
             queryClient.setQueryData(['wishlist'], (old: any) => {
                 if (!old) return old;
                 if (isWishlisted) {
-                    // Remove product
                     return old.filter((item: any) => item.product_id !== productId);
                 } else {
-                    // Add product (temporary optimistic entry)
                     return [...old, { product_id: productId, id: Date.now() }];
                 }
             });
             return { previousWishlist };
         },
-        onError: (err, variables, context) => {
-            // Rollback on error
+        onError: (_err, _variables, context) => { // <-- prefix with _
             queryClient.setQueryData(['wishlist'], context?.previousWishlist);
         },
         onSettled: () => {
-            // Refetch to get the real list after mutation completes
             queryClient.invalidateQueries({ queryKey: ['wishlist'] });
         },
     });

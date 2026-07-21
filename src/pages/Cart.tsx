@@ -1,13 +1,20 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { ShoppingBag, Minus, Plus, Trash2 } from 'lucide-react';
+import type { CartItem } from '../types';
 
 export default function Cart() {
     const { cartQuery, updateQuantity, removeItem } = useCart();
     const { data: cartItems, isLoading, error } = cartQuery;
 
-    const totalItems = cartItems?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-    const totalPrice = cartItems?.reduce((sum, item) => sum + item.subtotal, 0) || 0;
+    const totalItems = cartItems?.reduce(
+        (sum: number, item: CartItem) => sum + item.quantity,
+        0
+    ) || 0;
+    const totalPrice = cartItems?.reduce(
+        (sum: number, item: CartItem) => sum + item.subtotal,
+        0
+    ) || 0;
 
     if (isLoading) {
         return <div className="text-center py-12 text-gray-500">Loading your cart...</div>;
@@ -40,21 +47,16 @@ export default function Cart() {
     return (
         <div className="max-w-4xl mx-auto">
             <h1 className="text-2xl font-bold text-gray-900 mb-8">Your Cart</h1>
-
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                {/* Cart items list */}
                 <ul className="divide-y divide-gray-200">
-                    {cartItems.map((item) => (
+                    {cartItems.map((item: CartItem) => ( // <-- type added
                         <li key={item.id} className="p-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                            {/* Product info */}
                             <div className="flex-1">
                                 <Link to={`/products/${item.product_id}`} className="font-medium text-gray-900 hover:text-blue-600">
                                     {item.name}
                                 </Link>
                                 <p className="text-sm text-gray-500">${item.price.toFixed(2)} each</p>
                             </div>
-
-                            {/* Quantity controls */}
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => updateQuantity.mutate({ productId: item.product_id, quantity: item.quantity - 1 })}
@@ -72,8 +74,6 @@ export default function Cart() {
                                     <Plus size={16} />
                                 </button>
                             </div>
-
-                            {/* Subtotal and remove */}
                             <div className="flex items-center gap-4">
                                 <span className="font-medium text-gray-900 w-20 text-right">
                                     ${item.subtotal.toFixed(2)}
@@ -89,8 +89,6 @@ export default function Cart() {
                         </li>
                     ))}
                 </ul>
-
-                {/* Cart summary */}
                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
                     <div className="flex justify-between items-center">
                         <div>

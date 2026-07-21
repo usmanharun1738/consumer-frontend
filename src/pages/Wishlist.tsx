@@ -4,6 +4,7 @@ import { useCart } from '../hooks/useCart';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import WishlistButton from '../components/WishlistButton';
+import type { WishlistItem } from '../types';
 
 export default function Wishlist() {
     const { data: wishlistItems, isLoading, error } = useQuery({
@@ -50,7 +51,7 @@ export default function Wishlist() {
         <div>
             <h1 className="text-2xl font-bold text-gray-900 mb-8">Your Wishlist</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {wishlistItems.map((item) => (
+                {wishlistItems.map((item: WishlistItem) => ( // <-- type added
                     <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
                         <Link to={`/products/${item.product_id}`}>
                             <div className="h-40 bg-gray-200 flex items-center justify-center">
